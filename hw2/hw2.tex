@@ -1,0 +1,153 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Scientific Computing Homework 2}
+\author{Howard Jing}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+I worked with Sonya Kim.
+\section*{4.4}
+
+\subsection*{a}
+Since $V$ = $R^n$ and $M$ is an n$\times$n real matrix, for $u \in V$, $u^* = u^T$. Similarly, $M^* = M^T$. Because $u^*Mu$ is a $1\times1$ matrix,
+
+\begin{align*}
+u^*Mu &= (u^*Mu)^T\\
+\iff u^TMu &= ((u^*M)(u))^T\\ &= u^T(u^*M)^T\\ &= u^TM^T(u^*)^T\\ &=u^TM^T{u^T}^T\\ &=u^TM^Tu\\
+\implies u^*Mu &= u^*M^*u
+\end{align*}
+\\For $a \in R$, if $a= u^TMu$ then $a = u^TM^Tu$
+
+\begin{align*}
+a &= \frac{1}{2}a + \frac{1}{2}a\\
+\implies a &= \frac{1}{2}(u^TMu) + \frac{1}{2}(u^TM^Tu)\\
+&= u^T\frac{1}{2}Mu + u^T\frac{1}{2}M^Tu\\
+& = u^T(\frac{1}{2}M + \frac{1}{2}M^T)u\\ 
+&= u^*(\frac{1}{2}(M+M^*))u\\
+\end{align*}
+
+\subsection*{b}
+For $a \in R$,
+\begin{align*}
+||au|| &= ((au)^TM(au))^\frac{1}{2}\\
+&= (a^2 u^TMu)^\frac{1}{2}\\
+&= (a^2)^\frac{1}{2}(u^TMu)^\frac{1}{2}\\
+&= |a|||u||
+\end{align*}
+So $||.||$ is homogeneous.
+
+\subsection*{c}
+Given: $u^TMu > 0$ when $u\neq 0$.
+\\We know that,
+\[
+||u|| = (u^TMu)^\frac{1}{2}
+\]
+\\For $u \neq 0$, 
+
+\[u^TMu > 0 \implies (u^TMu)^\frac{1}{2} > 0\]
+\\For $u = 0, $
+
+\begin{align*}u = 0 &\implies Mu = 0\\ &\implies u^TMu = 0\\ &\implies (u^TMu)^\frac{1}{2} = 0\end{align*}
+\\This means that $||u|| = 0$ if and only if $u = 0$ and is positive for all other $u$. Moreover, 
+\[
+||u|| \ge 0 \forall u
+\]
+
+\subsection*{d}
+Lemma: For $u$, $v \in V$, and $M$, an $n \times n$ symmetric real matrix,
+\[
+u^TMv = v^TMu
+\]
+Proof: Note that $u^TMv = (u^TMv)^T$ because $u^TMv$ is a $1\times1$ matrix.
+\begin{align*}
+u^TMv &= (u^TMv)^T\\
+&= ((u^TM)v)^T\\
+&= v^T(u^TM)^T\\
+&= v^TM^T{u^T}^T\\
+&= v^TMu
+\end{align*}
+
+We know that $\phi (t) = (u+tv)^*M(u+tv) $ is a quadratic function of $t$ that is non-negative for all $t$ if $M$ is positive definite. This implies that,
+
+\begin{align*}
+0 \le \phi (t) &= (u+tv)^*M(u+tv)\\
+&= u^TMu + u^TMtv + tv^TMu + tv^TMtv\\ 
+&= u^TMu + tu^TMv + tu^TMu + t^2v^TMv\\
+&= u^TMu + 2tu^TMv + t^2v^TMv \text{ (from Lemma)}\\
+\end{align*}
+
+We would like to find the minimum value of $\phi (t)$, but because $M$ is positive definite and $\phi (t)$ is quadratic, this simply means taking the derivative of $\phi (t)$ with respect to t and setting it equal to 0:
+
+\begin{align*}
+\phi (t) &= (v^TMv)t^2 + 2(u^TMv)t + u^TMu\\
+\phi '(t) &= 2v^TMvT + 2u^TMv = 0\\
+t &= \frac{-u^TMv}{v^TMv}
+\end{align*}
+
+Plug this value of t into the previous equation to get:
+\begin{align*}
+0 \le \phi (t) &= (v^TMv)(\frac{-u^TMv}{v^TMv})^2 + 2u^TMv(\frac{-u^TMv}{v^TMv}) + u^TMu\\
+&= \frac{(-u^TMv)^2}{v^TMv} - \frac{2(u^TMv)^2}{v^TMv} + u^TMu\\
+&= \frac{-(u^TMv)^2}{v^TMv} + u^TMu\\
+\implies (u^TMv)^2 &\le (u^TMu)(v^TMv)\\
+\implies (u^TMv)^2 &\le ||u||^2||v||^2\\
+\implies |u^TMv| &\le ||u||||v|| \text{ (since $a^TMa \ge 0$ $\forall a$)}
+\end{align*}
+Which is the Cauchy Schwarz inequality.
+
+\subsection*{e}
+By applying the Cauchy Schwarz inequality, we know that
+\[
+||u||^2 + 2|u^TMv| + ||v||^2 \le ||u||^2 + 2||u||||v||+ ||v||^2
+\]
+However, note that
+\begin{align*}
+||u+v||^2 &= (u+v)^TM(u+v)\\
+&= u^TMu + u^TMv + v^TMu + v^TMv\\
+&= ||u||^2 + 2u^TMv + ||v||^2 \text{ (from Lemma)}\\
+&= ||u||^2 + 2|u^TMv| + ||v||^2 \text{ (since $a^TMa \ge 0$ $\forall$ $a$)}\\
+\end{align*}
+Which means that 
+\[
+ ||u||^2 + 2|u^TMv| + ||v||^2 = ||u + v||^2 \le ||u||^2 + 2||u||||v||+ ||v||^2
+\]
+Which is the triangle inequality.
+
+\subsection*{f}
+If $M=I$, then $Mu = u$. This means that
+\begin{align*}
+(u^TMu)^\frac{1}{2} &= (u^Tu)^{1}{2}\\
+&= ({u_1}^2 + {u_2}^2 + ... + {u_n}^2)^\frac{1}{2}
+\end{align*}
+Which is the definition of the $l_2$ norm.
+
+\section*{5.2}
+A symmetric real $n \times n$ matrix $A$ is positive definite if and only if all its eigenvalues are positive.
+
+If $A$ is positive definite, then $\forall x \in R^n$ and $x \ne 0$ we know that $x^TAx > 0$. Also, $\forall$ eigenvectors $y$ of $A$, $\exists$ $\lambda \in R$ such that $Ay = \lambda y$,
+
+\begin{align*}
+\implies y^TAy &> 0\\
+\iff y^T\lambda y &> 0\\
+\iff \lambda y^Ty &>0\\ 
+\end{align*}
+Because the dot product $y^Ty$ is always nonnegative, we conclude that for every eigenvalue $\lambda$ of $A$, $\lambda$ must be positive for the above inequality to hold.
+
+To prove that if all of $A$'s eigenvalues are positive, note that if $A$ is symmetric, then $A$ can be decomposed into $A = R\Lambda R^T$, where $\Lambda$ is a diagonal matrix containing the eigenvalues of $A$. This means that $x^TAx = x^TR\Lambda R^Tx = y^T\Lambda y$ where $y = R^Tx$. Then if every diagonal entry of $\Lambda$ is positive implies that $y^T\Lambda y$ is positive definite, the proof is finished.
+If $y=0$, then $y^T\Lambda y = 0$. Otherwise note that,
+
+\begin{align*}
+y^T\Lambda y = \sum_{k=1}^{n} \lambda _k {y_k}^2 \implies \sum_{k=1}^{n} \lambda _k {y_k}^2 & > 0 
+\end{align*}
+because $\lambda _k, {y_k}^2$ are both greater than 0. This implies that $y^T \Lambda y > 0$ for $y \ne 0$ $\iff x^TAx > 0$ for $x \ne 0 $. So $A$ is positive definite. TO DO PART C!!!!!
+
+\end{document}  

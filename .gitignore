@@ -1,0 +1,7 @@
+# ignore extra tex files
+*.aux
+*.log
+*.pdf
+*.gz
+# ignore extra matlab files
+*.m~
