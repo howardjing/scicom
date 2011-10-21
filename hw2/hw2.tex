@@ -6,17 +6,88 @@
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{epstopdf}
+\usepackage{amsmath}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
 \title{Scientific Computing Homework 2}
-\author{Howard Jing}
+\author{Howard Jing, Sonya Kim}
 %\date{}                                           % Activate to display a given date or no date
 
 \begin{document}
 \maketitle
-I worked with Sonya Kim.
-\section*{4.4}
+\section*{Question 4.1}
+In order to change Hermite polynomial basis of P$_{3}$ to Hermite basis of P$_{2}$, we can compose 3 linear transformations.
 
+Let A be the linear transformation from Hermite polynomial basis of P$_{3}$ to power basis of P$_{3}$. According to page 73 of the textbook, that is:
+ \[
+A = \begin{bmatrix}
+1 & 0 & -1& 0 \\
+0 & 1 & 0 & -3 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}^{-1}  = 
+\begin{bmatrix}
+1 & 0 & 1& 0 \\
+0 & 1 & 0 & 3 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\]
+
+Let B be the linear transformation from power basis of P$_{3}$ to power basis of P$_{2}$. According to page 72 of the textbook, that is:
+\[
+B = \begin{bmatrix}
+0 & 1 & 0& 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 
+\end{bmatrix}
+\]
+
+Let C be the linear transformation from power basis of P$_{2}$ to Hermite polynomial basis of  P$_{2}$. According to page 73 of the textbook, that is:
+\[
+C = \begin{bmatrix}
+1 & 0 & -1 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\]
+
+Then we can express the linear transformation from Hermite polynomial basis of P$_{3}$ to Hermite polynomial basis of  P$_{2}$ as compositions of linear transformations CBA:
+\[
+CBA = 
+\begin{bmatrix}
+1 & 0 & -1 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix} * 
+\begin{bmatrix}
+0 & 1 & 0& 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 
+\end{bmatrix}*
+\begin{bmatrix}
+1 & 0 & 1& 0 \\
+0 & 1 & 0 & 3 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+0 & 1 & 0& 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 
+\end{bmatrix}
+\]
+
+Therefore the matrix that represents the differentiation operator that takes Hermite polynomial basis of P$_{3}$ to Hermite polynomial basis of P$_{2}$ is 
+\[
+\begin{bmatrix}
+0 & 1 & 0& 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 
+\end{bmatrix}
+\]
+
+\section*{Question 4.4}
 \subsection*{a}
 Since $V$ = $R^n$ and $M$ is an n$\times$n real matrix, for $u \in V$, $u^* = u^T$. Similarly, $M^* = M^T$. Because $u^*Mu$ is a $1\times1$ matrix,
 
@@ -129,8 +200,95 @@ If $M=I$, then $Mu = u$. This means that
 &= ({u_1}^2 + {u_2}^2 + ... + {u_n}^2)^\frac{1}{2}
 \end{align*}
 Which is the definition of the $l_2$ norm.
+\newline
+\newline
 
-\section*{5.2}
+\section*{Question 4.8}
+\[
+||A^{-1}|| = \max_{x \ne 0}{\frac{||A^{-1}x||}{||x||}} = \frac{1}{\min_{x \ne 0}{\frac{||x||}{||A^{-1}x||}}}
+\]
+Let A$^{-1}$x = y $\implies$ AA$^{-1}$x = Ay $\implies$ x = Ay. 
+
+\[
+||A^{-1}|| = \frac{1}{\min_{y \ne 0}{\frac{||Ay||}{||y||}}} =  \max_{y \ne 0}{\frac{||y||}{||Ay||}}
+\]
+\newline
+
+\section*{Question 4.11}
+\subsection*{a}
+
+A must be a tridiagonal matrix of the form below in order for equation (4.45) to be set up properly.
+\[
+A = \begin{bmatrix}
+-2 & 1 & 0 & \cdots & & 0 \\
+1 & -2 & 1 &  &  & \vdots \\
+0 & 1 & -2 & 1 &    \\
+\vdots &  & 1 & -2 & \ddots  & 0\\
+\vdots &  & & \ddots & \ddots & 1  \\
+0 & \cdots & & 0 & 1 & -2
+\end{bmatrix}
+\]
+\newline
+
+In order to check that A has n-1 distinct eigenvectors having the form r$_{kj}$ = sin(k$\pi$x$_{j}$), find that A has n-1 distinct eigenvalues, which in turn implies that there are n-1 distinct eigenvectors. 
+
+Eigenvectors have to satisfy the equation (Ar$_{k}$)$_{j}$ = $\lambda_{k}$r$_{kj}$
+\[
+\frac{1}{2(\Delta x)^2}[\sin(k\pi x_{j-1}) - 2\sin(k\pi x_{j}) + sin(k\pi x_{j+1})] = \lambda_{k}\sin(k\pi x_{j})
+\]
+
+\begin{align*}
+\lambda_{k} &= \frac{\sin(k\pi(x_{j} - \Delta x)) - 2\sin(k\pi x_{j}) + \sin(k\pi(x_{j}+\Delta x))}{2(\Delta x)^2\sin(k\pi x_{j})}\\
+&= \frac{\sin(k\pi x_{j}-k \pi \Delta x)-2\sin(k\pi x_{j})+\sin(k\pi x_{j}+k \pi \Delta x)}{2(\Delta x)^2\sin(k\pi x_{j})}\\
+&= \frac{\sin(k\pi x_{j})\cos(k\pi \Delta x)-2\sin(k\pi x_{j}) + \sin(k\pi x_{j})\cos(k\pi \Delta x)}{2(\Delta x)^2\sin(k\pi x_{j})}\\
+&= \frac{2\sin(k\pi x_{j})\cos(k\pi \Delta x)-2\sin(k\pi x_{j})}{2(\Delta x)^2\sin(k\pi x_{j})}\\
+&= \frac{\cos(k\pi \Delta x)-1}{(\Delta x)^2}
+\end{align*}
+
+Since k$\Delta$x  $\le$ 1, and the periodicity of cosine is 2$\pi$, all of the eigenvalues $\lambda$$_{k}$'s are distinct. Thus there are n-1 distinct eigenvectors.
+
+\subsection*{b}
+From question 4.8, we established that 
+\[
+||A^{-1}|| = \max_{u \ne 0}{\frac{||u||}{||Au||}}
+\]
+
+But for which eigenvector is the value of the norm maximum? If we set u = r$_{min}$,
+\[
+\frac{||u||}{||Au||} = \frac{||r_{min}||}{|\lambda_{min}| ||r_{min}||}
+= \frac{1}{|\lambda_{min}|}
+\]
+
+Indeed if we set u equal the smallest eigenvector, the norm of the inverse of A is maximized. Since we know $\lambda$$_{k}$, taylor expand it.
+\begin{align*}
+\lambda_{k} &= \frac{\cos(k\pi \Delta x)-1}{(\Delta x)^2}\\
+&= \frac{1}{(\Delta x)^2} [1- \frac{(k\pi \Delta x)^2}{2}+ \cdot \cdot \cdot -1]\\
+&= -\frac{(k\pi \Delta x)^2}{2(\Delta x)^2}\\
+&= -\frac{(k\pi)^2}{2}
+\end{align*}
+By inspection of the expression for $|$$\lambda$$_{k}$$|$, note that $|$$\lambda$$_{1}$$|$ is the smallest, $|$$\lambda$$_{n-1}$$|$ is the largest.
+\[
+||A^{-1}|| = \frac{1}{|\lambda_{1}|}= \frac{1}{|-\frac{(\pi)^2}{2}|}=\frac{2}{\pi^2}
+\]
+\[
+||A|| = |\frac{-((n-1)\pi)^2}{2}| = |\frac{n^2 \pi^2+2n\pi^2-\pi^2}{2}|
+\]
+\[\kappa(A) = ||A^{-1}||\cdot||A|| = (\frac{2}{\pi^2}) |\frac{n^2 \pi^2+2n\pi^2-\pi^2}{2}| = n^{2}+2n-1
+\]
+Therefore $\kappa$(A) = O(n$^{2}$) as n $\to$ $\infty$. 
+\newline
+\newline
+\subsection*{c}
+ADD HERE HOWARD
+\subsection*{d}
+R = A$\tilde{U}$ - F. Since F = AU $\implies$ R = A$\tilde{U}$ - AU = A($\tilde{U}$ - U)
+\newline
+Left multiply by A$^{-1}$ to get A$^{-1}$R = ($\tilde{U}$ - U)
+\[
+||\tilde{U} - U|| = || U - \tilde{U}|| = ||A^{-1}R|| \le ||A^{-1}||\cdot||R|| \le (\frac{2}{\pi^2})(O(\Delta x)^2)
+\]
+Thus $||$U - $\tilde{U}$$||$ = O($\Delta$x$^{2}$).
+\section*{Question 5.2}
 A symmetric real $n \times n$ matrix $A$ is positive definite if and only if all its eigenvalues are positive.
 
 If $A$ is positive definite, then $\forall x \in R^n$ and $x \ne 0$ we know that $x^TAx > 0$. Also, $\forall$ eigenvectors $y$ of $A$, $\exists$ $\lambda \in R$ such that $Ay = \lambda y$,
@@ -149,5 +307,7 @@ If $y=0$, then $y^T\Lambda y = 0$. Otherwise note that,
 y^T\Lambda y = \sum_{k=1}^{n} \lambda _k {y_k}^2 \implies \sum_{k=1}^{n} \lambda _k {y_k}^2 & > 0 
 \end{align*}
 because $\lambda _k, {y_k}^2$ are both greater than 0. This implies that $y^T \Lambda y > 0$ for $y \ne 0$ $\iff x^TAx > 0$ for $x \ne 0 $. So $A$ is positive definite. TO DO PART C!!!!!
+\newline
+\newline
 
 \end{document}  
