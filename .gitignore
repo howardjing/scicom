@@ -5,3 +5,4 @@
 *.gz
 # ignore extra matlab files
 *.m~
+.DS_Store
