@@ -1,0 +1,552 @@
+\documentclass{article}
+
+
+% load package with ``framed'' and ``numbered'' option.
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+
+% something NOT relevant to the usage of the package.
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{18pt}
+\title{Scientific Computing Homework 1}
+\author{Howard Jing}
+\begin{document}
+\maketitle
+\textbf{Chapter 2 - Question 2}
+
+a) We can show that $f_{jk}$ = sin($x_{0}$ + (j-k)$\pi$/3) satisfies the recurrence relation $ {f}_{j,k+1} = f_{j,k} - f_{j+1,k}  $ using trigonometric identities. The given recurrence relation can be rewritten as 
+\[
+\sin(x_{0}+(j-k-1)\pi/3) = \sin(x_{0}+(j-k)\pi/3) - \sin(x_{0}+(j+1-k)\pi/3)
+\]
+Using the trig identity sin(x)-sin(y) = 2 cos($\frac{x+y}{2}$) + sin($\frac{x-y}{2}$), and letting n = j-k, the right hand side of the above equation becomes 
+\begin{align*}
+\sin(x_{0}+n\pi/3) - \sin(x_{0}+(n+1)\pi/3) &= 2 \cos(\frac{ x_{0}+\frac{n\pi}{3}+x_{0}+\frac{(n+1)\pi}{3}}{2}) \cdot \sin(\frac{ x_{0}+\frac{n\pi}{3}-x_{0}-\frac{(n+1)\pi}{3}}{2})\\
+&= 2 \cos(\frac{\frac{6x_{0}+(2n+1)\pi} {3}} {2 }) \cdot \sin(\frac{\frac{n\pi-n\pi-\pi} {3}} {2})\\
+&=2\cos(\frac{6x_{0}+(2n+1)\pi}{6}) \cdot \sin(\frac{-\pi}{6})\\
+&=-\cos(x_{0}+\frac{(2n+1)\pi}{6})
+\end{align*}
+Using the fact that -cos(x) = sin(x-($\pi$/2)), the above can be rewritten as 
+\begin{align*}
+\sin(x_{0}+\frac{(2n+1)\pi}{6}-\frac{\pi}{2}) &= \sin(x_{0}+\frac{n\pi-\pi}{3}) = \sin(x_{0}+\frac{(n-1)\pi}{3}) = \sin(x_{0}+\frac{(j-k-1)\pi}{3})
+\end{align*}
+Thus, the left hand side of the first equation equals right hand side. QED
+
+
+b) If $\left |  \hat{f}_{jk}-f_{jk}  \right |$ $<$ $\epsilon$ for all j, we can show that $\left |  \hat{f}_{j,k+1}-f_{j,k+1}  \right |$ $<$ 2$\epsilon$ for all j using the definition of recurrence relation $ {f}_{j,k+1} = f_{j,k} - f_{j+1,k}  $. 
+\[
+\left |  \hat{f}_{j,k+1}-f_{j,k+1}  \right | = \left |  \hat{f}_{j,k}-\hat{f}_{j+1,k}-(f_{j,k}-f_{j+1,k})  \right | =  \left |  \hat{f}_{j,k}-f_{j,k}+(f_{j+1,k}-\hat{f}_{j+1,k})  \right | 
+\]
+\[
+\le \left |  \hat{f}_{j,k}-f_{j,k} \right |+ \left |f_{j+1,k}-\hat{f}_{j+1,k}  \right | = \epsilon + \epsilon = 2\epsilon
+\]
+
+The above is true by triangle inequality. QED
+
+\newpage
+c) Recursion using MATLAB
+\begin{lstlisting}
+% records the errors corresponding to each k
+function [errors] = ch2_prob3
+    global lookup_table;
+    
+    lookup_table = zeros(60,60);
+    errors = zeros (1,60);
+    double_error = zeros(1,60);
+    
+    for i = 1:60
+        errors(i) = error(i);
+    end
+    
+    for j=1:60
+        double_error(j) = 2^(j-1)*errors(1);
+    end
+    
+    % plotting the error on a linear scale
+    figure
+    plot(errors,'x-')
+    title('Error ek On Linear Scale')
+    xlabel('Index of k')
+    ylabel('Error ek') 
+    
+    
+    % ploting the error on a log scale
+    figure
+    semilogy(errors, '.-');
+    hold on
+    title('Error ek On Log Scale')
+    xlabel ('Index of k')
+    ylabel ('Error ek')
+    semilogy(double_error,'r--');
+    legend('error ek','doubling error')
+    hold off
+end
+
+%computes fRecursive - fNormal given input k, using j = 0, x0 = 1
+function [e_k] = error(k)
+    e_k = abs(fRecursive(0,k) - fNormal(0,k));
+    return;
+end
+
+%computes the function sin(x0 + (j-k)*pi/3 without recursion
+function [normal_answer] = fNormal(j,k)
+    x0 = 1;
+    normal_answer = sin(x0 + (j-k)*(pi/3));
+    return;
+end
+
+% computes function sin(x0 +(j-k)*pi/3) recursively
+function [recursion_answer] = fRecursive(j,k)
+    global lookup_table;
+    x0 = 1;
+    
+    % base case
+    if k == 0                           
+        recursion_answer = sin(x0 + j*(pi/3));
+        return;
+    else
+        
+        % first check that j is <= 59 so it does not go out of bound
+            if j<=59
+                % if lookup table for that k is already filled in 
+                %(i.e. ~= 0, look up answer in the table)
+                if lookup_table(j+1,k) ~= 0
+                    recursion_answer = lookup_table(j+1,k);
+                    return;
+                % if lookup table is not filled in (i.e. =0, compute 
+                % using recursion and fill in the lookup table 
+                % for that entry)
+                else
+                    recursion_answer = fRecursive(j,k-1)-fRecursive(j+1,k-1);
+                    lookup_table(j+1,k) = recursion_answer;
+                    return;
+                end
+            end
+    end
+end
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=5in,keepaspectratio]{ch2prob3graph1.eps}
+
+\includegraphics[width=5in,keepaspectratio]{ch2prob3b.eps}
+\end{center}
+
+\textbf{Chapter 2 - Question 5}
+
+If f(x) is a differentiable function of x with derivative f'(x), then for a small  $\Delta$x , we can write the condition number $\kappa$. Given x $\approx$ $10^{-3}$, f(x) $\approx$ $10^{5}$ and f'(x) $\approx$ $10^{10}$, 
+\[
+\kappa = \left |  f'(x)\cdot \frac{x}{f(x)}  \right | = \left |  10^{10}\cdot \frac{10^{-3}}{10^{5}}  \right | = \left |  10^{10-3-5}  \right | = 10^{2} 
+\]
+
+For single precision, relative error is 
+\[
+\left | \frac{\hat{f}(x)-f(x)}{f(x)}  \right | \approx \kappa\epsilon_{mach}  \approx 10^{2} \cdot (6\cdot10^{-8}) = 6\cdot 10^{-6}
+\]
+
+For double precision, relative error is 
+\[
+\left | \frac{\hat{f}(x)-f(x)}{f(x)}  \right | \approx \kappa\epsilon_{mach}  \approx 10^{2} \cdot 10^{-16} =  10^{-14}
+\]
+
+Since for both single and double precision, the relative errors are small, the problem is ill-conditioned for neither single nor double precision. 
+
+\newpage
+\textbf{Chapter 2 - Question 6}
+
+Using proof by induction, first check the base case for when n=2. Let S = x[0]+x[1]. Since any floating point sum x + y has relative error $\epsilon$ $<$ $\epsilon_{mach}$, 
+\[
+\frac{S-\sum\limits_{i=0}^1 \left | x_{i} \right |}{\sum\limits_{i=0}^1 \left | x_{i} \right |} = \epsilon < \epsilon_{mach}
+\]
+\[
+S -\sum\limits_{i=0}^1 \left | x_{i} \right | = \epsilon \sum\limits_{i=0}^1 \left | x_{i} \right | < \epsilon_{mach}
+ \sum\limits_{i=0}^1 \left | x_{i} \right | \\ = (2-1) \epsilon_{mach}
+ \sum\limits_{i=0}^1 \left | x_{i} \right | \\ = (n-1) \epsilon_{mach}
+ \sum\limits_{i=0}^1 \left | x_{i} \right |
+\]
+
+Therefore, the base case holds. 
+
+Moving onto the inductive step, assume the hypothesis holds for n; that is S = x[0]+x[1]+$\cdot$$\cdot$$\cdot$+x[n-1] has absolute error no worse than (n-1)$\epsilon_{mach}$ $\sum\limits_{i=0}^{n-1} \left | x_{i} \right |$. That is,
+\[
+S - \sum\limits_{i=0}^{n-1} \left | x_{i} \right | < (n-1) \epsilon_{mach} \sum\limits_{i=0}^{n-1} \left | x_{i} \right |
+\]
+This implies that or the case n+1, 
+\[
+S + x[n] - \sum\limits_{i=0}^{n} \left | x_{i} \right | < (n-1) \epsilon_{mach} \sum\limits_{i=0}^{n-1} \left | x_{i} \right | + x[n] - x_{n}
+\]
+Since  x[n] - $x_{n}$ $\le$ $\epsilon_{mach}$ $\cdot$ $x_{n}$,
+\[
+S + x[n] - \sum\limits_{i=0}^{n} \left | x_{i} \right | < (n-1) \epsilon_{mach} \sum\limits_{i=0}^{n-1} \left | x_{i} \right | + \epsilon_{mach} \cdot x_{n} <  (n) \epsilon_{mach} \sum\limits_{i=0}^{n} \left | x_{i} \right |
+\]
+QED.
+
+
+\textbf{Chapter 2 - Question 8}
+
+Recursion and Plotting using MATLAB 
+\begin{lstlisting}
+function [fibon pibon backFibDoubleError backPibDoubleError backFibSingleError backPibSingleError] = hw1_prob9
+
+    length = 100;
+    %lookup table for fib and pib
+    global fibLook pibLook;
+    global backwardsFibLook backwardsPibLook;
+    global backwardsFibLookSingle backwardsPibLookSingle;
+    
+    fibLook = zeros(1, length);
+    pibLook = zeros(1, length);
+    
+    backwardsFibLook = zeros(length,length);
+    backwardsPibLook = zeros(length,length);
+    
+    backwardsFibLookSingle = zeros(length, length);
+    backwardsPibLookSingle = zeros(length, length);
+    
+    fib(length);
+    pib(length);
+    
+    fibon = fibLook;
+    pibon = pibLook;
+    
+    for i=length:-1:1
+        backwardsFib(i,1);
+        backwardsPib(i,1);
+        
+        backwardsFibSingle(i,1);
+        backwardsPibSingle(i,1);
+    end
+    backFibDoubleError = abs(backwardsFibLook(:,1)-fibLook(1,1))';
+    backPibDoubleError = abs(backwardsPibLook(:,1)-pibLook(1,1))';
+    
+    backFibSingleError = abs(backwardsFibLookSingle(:,1)-fibLook(1,1))';
+    backPibSingleError = abs(backwardsPibLookSingle(:,1)-pibLook(1,1))';    
+    
+    % Graph the result for fibonacci
+    figure
+    semilogy([1:length],backFibDoubleError,'-')
+    hold on
+    semilogy([1:length],backFibSingleError,'r--')
+    title('Difference between Fibonacci and Backwards Fibonacci on Log Scale')
+    xlabel('starting k')
+    ylabel('fib(0) - backwardsfib(0)')
+    legend('Fibonacci error with Double Precision','Fibonacci error with Single Precision')
+    hold off
+    
+    % Graph the result for pibonacci
+    figure
+    semilogy([1:length],backPibDoubleError,'-')
+    hold on 
+    semilogy([1:length],backPibSingleError,'r--')
+    title('Difference between Pibonacci and Backwards Pibonacci on Log Scale')
+    xlabel('starting k')
+    ylabel('pib(0) - backwardspib(0)')
+    legend('Pibonacci error with Double Precision','Pibonacci error with Single Precision')
+    hold off
+    return;
+end
+
+function [answer] = fib(k)
+    global fibLook;
+    
+    %base case
+    if k <= 2
+        answer = 1;
+        fibLook(1,k) = answer;
+        return;
+    else
+        %check if we already computed the answer
+        if fibLook(1,k) ~= 0
+            answer = fibLook(1,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        answer = fib(k-1) + fib(k-2);
+        fibLook(1, k) = answer;
+        return;
+    end
+end
+
+function [answer] = pib(k)
+    global pibLook;
+    
+    %base case
+    if k <= 2
+        answer = 1;
+        pibLook(1,k) = answer;
+        return;
+    else
+        %check if we already computed the answer
+        if pibLook(1,k) ~= 0
+            answer = pibLook(1,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        c = 1 + sqrt(3)/100;
+        answer = c*pib(k-1) + pib(k-2);
+        pibLook(1, k) = answer;
+        return;
+    end
+end
+
+function [answer] = backwardsFib(j, k) % j for row, k for column
+    global backwardsFibLook;
+    global fibLook;
+    
+    %base case
+    if (k == j) || (k == j-1)
+        answer = fibLook(1,k);
+        backwardsFibLook(j,k) = answer;
+        return;
+    else
+        %check if we have already computed the answer
+        if backwardsFibLook(j,k) ~= 0
+            answer = backwardsFibLook(j,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        answer = backwardsFib(j,k+2) - backwardsFib(j,k+1);
+        backwardsFibLook(j,k) = answer;
+        return;
+    end
+end
+
+function [answer] = backwardsPib(j, k) % j for row, k for column
+    global backwardsPibLook;
+    global pibLook;
+    
+    %base case
+    if (k == j) || (k == j-1)
+        answer = pibLook(1,k);
+        backwardsPibLook(j,k) = answer;
+        return;
+    else
+        %check if we have already computed the answer
+        if backwardsPibLook(j,k) ~= 0
+            answer = backwardsPibLook(j,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        c = 1 + sqrt(3)/100;
+        answer = backwardsPib(j,k+2) - c*backwardsPib(j,k+1);
+        backwardsPibLook(j,k) = answer;
+        return;
+    end
+end
+
+%single precision backwards fib
+function [answer] = backwardsFibSingle(j, k) % j for row, k for column
+    global backwardsFibLookSingle;
+    global fibLook;
+    
+    %base case
+    if (k == j) || (k == j-1)
+        answer = fibLook(1,k);
+        backwardsFibLookSingle(j,k) = answer;
+        return;
+    else
+        %check if we have already computed the answer
+        if backwardsFibLookSingle(j,k) ~= 0
+            answer = backwardsFibLookSingle(j,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        answer = single(backwardsFibSingle(j,k+2) - backwardsFibSingle(j,k+1));
+        backwardsFibLookSingle(j,k) = answer;
+        return;
+    end
+end
+
+%single precision backwards pib
+function [answer] = backwardsPibSingle(j, k) % j for row, k for column
+    global backwardsPibLookSingle;
+    global pibLook;
+    
+    %base case
+    if (k == j) || (k == j-1)
+        answer = pibLook(1,k);
+        backwardsPibLookSingle(j,k) = answer;
+        return;
+    else
+        %check if we have already computed the answer
+        if backwardsPibLookSingle(j,k) ~= 0
+            answer = backwardsPibLookSingle(j,k);
+            return;
+        end
+        
+        %otherwise recurse and record in lookup table
+        answer = single(backwardsPibSingle(j,k+2) - backwardsPibSingle(j,k+1));
+        backwardsPibLookSingle(j,k) = answer;
+        return;
+    end
+end
+
+\end{lstlisting}
+
+
+\newpage
+a)
+\begin{center}
+\includegraphics[width=4.5in,keepaspectratio]{prob9agraph.eps}
+\end{center}
+b) Since log(0) is undefined, the graph below starts when the recomputed values of fibonacci numbers show no accuracy. For double precision, the values start to show no accuracy at k=79 and for single precision,  at k=39.
+\begin{center}
+\includegraphics[width=4.5in,keepaspectratio]{fibon.eps}
+\end{center}
+c) The graph below starts when the recomputed values of pibonacci numbers show loss of accuracy. For double precision, the values start to show loss of accuracy at k=7 and for single precision, at k=3. Compared to fibonacci, the errors for pibonacci begin to show early on but has less sudden jumps in error.  
+\begin{center}
+\includegraphics[width=5in,keepaspectratio]{pibon.eps}
+\end{center}
+
+\textbf{Chapter 3 - Question 2}
+\[
+\Delta f = \frac{\partial^{2} f}{\partial x^{2}} + \frac{\partial^{2} f}{\partial y^{2}} \approx \frac{1}{2h^2}[f(x+h,y+h) + f(x+h,y-h) + f(x-h, y+h) + f(x-h,y-h) - 4f]
+\]
+Using Taylor's Theorem yields the following:
+\begin{equation}
+ f(x+h,y+h) = f + hf_{x} - hf_{y} + \frac{1}{2}h^{2}f_{xx} - h^{2}f_{xy} + \frac{1}{2}h^{2}f_{yy} + \frac{1}{6}h^{3}f_{xxx} + \frac{1}{2}h^{3}f_{xxy} + \frac{1}{2}h^{3}f_{xyy} + \frac{1}{6}h^{3}f_{yyy} + ...
+\end{equation}
+\begin{equation}
+f(x+h,y-h) = f + hf_{x} - hf_{y} + \frac{1}{2}h^{2}f_{xx} - h^{2}f_{xy} + \frac{1}{2}h^{2}f_{yy} + \frac{1}{6}h^{3}f_{xxx} - \frac{1}{2}h^{3}f_{xxy} + \frac{1}{2}h^{3}f_{xyy} - \frac{1}{6}h^{3}f_{yyy} + ...
+\end{equation}
+\begin{equation}
+ f(x-h,y+h) = f - hf_{x} + hf_{y} + \frac{1}{2}h^{2}f_{xx} - h^{2}f_{xy} + \frac{1}{2}h^{2}f_{yy} - \frac{1}{6}h^{3}f_{xxx} + \frac{1}{2}h^{3}f_{xxy} - \frac{1}{2}h^{3}f_{xyy} + \frac{1}{6}h^{3}f_{yyy} + ...
+\end{equation}
+\begin{equation}
+f(x-h,y-h) = f - hf_{x} - hf_{y} + \frac{1}{2}h^{2}f_{xx} + h^{2}f_{xy} + \frac{1}{2}h^{2}f_{yy} - \frac{1}{6}h^{3}f_{xxx} - \frac{1}{2}h^{3}f_{xxy} - \frac{1}{2}h^{3}f_{xyy} - \frac{1}{6}h^{3}f_{yyy} + ...
+\end{equation}
+
+Adding (1)  (2) (3) and (4) yields:
+\[
+4f + 2h^{2}f_{xx} + 2h^{2}f_{yy} + \frac{h^{4}}{6}f_{xxxx} + \frac{h^{4}}{6}f_{yyyy} +{h^{4}}f_{xxyy}...
+\]
+because every partial derivative that is not with respect to an even number of both x's and y's cancels out due to symmetry. Subtracting $4f$ and multiplying by $\frac{1}{2h^{2}}$ yields:
+\[
+f_{xx} + f{yy} + \frac{h^{2}}{12}(f_{xxxx} + 6f_{xxyy} + f_{yyyy} ) + O(h^{3})
+\]
+So the approximation is at least second order accurate with a leading error term of 
+\[
+\frac{h^{2}}{12}(f_{xxxx} + 6f_{xxyy} + f_{yyyy} )
+\]
+
+
+\textbf{Chapter 3 - Question 4}
+
+The approximation formula for f''(x) using 4 values f(x), f(x+h), f(x+2h) and f(x+3h) can be found by the method of undetermined coefficients. Let the ansatz be 
+\[
+f''(x) \sim A\cdot f(x)+B\cdot f(x+h) + C \cdot f(x+2h) + D \cdot f(x+3h)
+\]
+By Taylor's expansion,  
+\[
+f(x+h) = f(x) + f'(x)h + \frac{1}{2}f''(x)h^{2}+\frac{1}{6}f'''(x)h^{3}+...
+\]
+\[
+f(x+2h) =f(x)+2f'(x)h+2f''(x)h^{2}+\frac{4}{3}f'''(x)h^{3}+...
+\]
+\[
+f(x+3h) =f(x)+3f'(x)h+\frac{9}{2}f''(x)h^{2}+\frac{27}{6}f'''(x)h^{3}+...
+\]
+The approximation to f''(x) can be rewritten as 
+\[
+f''(x) \sim A\cdot f(x) 
+\]
+\[
++ B \cdot (f(x) + f'(x)h + \frac{1}{2}f''(x)h^{2}+\frac{1}{6}f'''(x)h^{3}+...)
+\]
+\[
++ C\cdot (f(x)+2f'(x)h+2f''(x)h^{2}+\frac{4}{3}f'''(x)h^{3}+...)
+\]
+\[
++D \cdot (f(x)+3f'(x)h+\frac{9}{2}f''(x)h^{2}+\frac{27}{6}f'''(x)h^{3}+...)
+\]
+\[
+= f(x)[A+B+C+D] + hf'(x)[B+2C+3D]+h^{2}f''(x)[\frac{1}{2}B+2C+\frac{9}{2}D]+h^{3}f'''(x)[\frac{1}{6}B+\frac{4}{3}C+\frac{27}{6}D]
+\]
+
+Therefore the constraints for solving the undetermined coefficients are 
+\[
+A+B+C+D= 0
+\]
+\[
+h(B+2C+3D)=0
+\]
+\[
+h^{2}(\frac{1}{2}B+2C+\frac{9}{2}D)=0
+\]
+\[
+h^{3}(\frac{1}{6}B+\frac{4}{3}C+\frac{27}{6}D)=0
+\]
+Solving the linear equations, we get 
+\[
+A = \frac{2}{h^{2}}, B= \frac{-5}{h^{2}}, C = \frac{4}{h^{2}}, D = \frac{-1}{h^{2}}
+\]
+
+Thus the approximation formula for f''(x) using one sided 4 points is 
+\[
+f''(x) \sim \frac{2f(x)-5 f(x+h) + 4f(x+2h) - f(x+3h)}{h^{2}}
+\]
+
+
+\textbf{Chapter 3 - Question 9}
+
+Let $\hat A$ = fl(A) and A = $\frac{f(x+h)-f(x-h)}{2h}$, the two point centered difference approximation to f'(x). Then total error is
+\[
+\left | \hat A - f'(x)  \right | = \left |(\hat A - A) + (A- f'(x))  \right | \le \left | \hat A - A  \right | + \left | A - f'(x)  \right | \le \epsilon \left | A \right | + O(h^{2})
+\] 
+The round off error above is bound by rearranging the relative error term. The truncation error O($h^{2}$) follows from the taylor expansion of A and finding the difference between A and f'(x):
+\[
+f(x+h) = f(x) + hf'(x)+\frac{1}{2}h^{2}f''(x)+\frac{1}{6}h^{3}f'''(x)+O(h^{4})
+\]
+\[
+f(x-h) = f(x) - hf'(x)+\frac{1}{2}h^{2}f''(x)-\frac{1}{6}h^{3}f'''(x)+O(h^{4})
+\]
+\[
+\frac{f(x+h)-f(x-h)}{2h} = f'(x) + \frac{1}{6}h^{2}f'''(x)+O(h^{3})
+\]
+Therefore,
+\[
+\left | \hat A - f'(x)  \right | =  \frac{1}{6}h^{2}f'''(x)+O(h^{3})
+\]
+and the error is second order. Then, the total error function can be written as,
+\[
+E_{h} = \epsilon \cdot O(\frac{1}{h}) + O(h^{2})
+\]
+Differentiating the function then setting it equal zero to find minimum error, 
+\[
+\frac{dE_{h}}{dh}= \frac{-\epsilon}{h^{2}}+2h = 0
+\]
+\[
+\epsilon = 2h^{3}
+\]
+\[
+h= (\frac{\epsilon}{2})^{\frac{1}{3}}
+\]
+Plugging the value of h into the original error function, we get minimum error
+\[
+E_{min} = \epsilon \cdot O(\frac{\epsilon}{2})^\frac{-1}{3} + O(\frac{\epsilon}{2})^\frac{2}{3}
+\]
+Going through similar process, we can derive the total error function using first order approximation. For forward approximation, the total error function is 
+\[
+E_{h} = \epsilon \cdot O(\frac{1}{h}) + O(h)
+\]
+\newpage
+Graphing helps enhance a visual understanding of why the best error possible with centered differencing is better than the best possible with first order approximation. The error function of centered difference shown in red line clearly has a lower minimum than the error function of forward difference shown in blue. 
+
+\begin{center}
+\includegraphics[width=5in,keepaspectratio]{errordiff.eps}
+\end{center}
+
+\end{document}
+
+psflatex hw1
