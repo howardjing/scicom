@@ -48,7 +48,7 @@ function [answer] = analyzeError(solution, steps)
     
     for i=1:length(steps)
         residual = abs(solution - steps(i,:));
-        answer = [answer; residual];
+        answer = [answer; norm(residual, 2)];
     end
 end
 

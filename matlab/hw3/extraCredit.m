@@ -8,6 +8,19 @@ function [varyBeta counterB determinantB errorB1 errorB2 varyRho counterR determ
     varyBeta = [1 1 1];
     counterB = [0];
     
+    fixedB = [];
+    % get the actual answer
+    for i=1:length(beta)
+        fixedB = [fixedB; findFixedPoint(rho(1), beta(i))];
+    end
+    
+    fixedR = [];
+    for i=1:length(rho)
+        fixedR = [fixedR; findFixedPoint(rho(i), beta(1))];
+    end
+    fixedB
+    fixedR
+    
     % We know that initially there is a solution at (1,1,1)
     for i=2:length(beta)
         
@@ -89,6 +102,8 @@ function [answer counter results] = Newton(sigma, rho, beta, initialGuess)
         
         counter = counter+1;
         results = [results; xk];
+        
+        
         
     end
     answer = xk;
