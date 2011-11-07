@@ -1,7 +1,9 @@
 function [answer] = hw3_q1()
 
+    len = 5;
+
     % Newton's method with x0 = 0.5
-    newton1 = zeros(1,10);
+    newton1 = zeros(1,len);
     newton1(1) = 0.5;
     for i=2:length(newton1)
         newton1(i) = step(newton1(i-1));
@@ -10,7 +12,7 @@ function [answer] = hw3_q1()
     plot(1:length(newton1), newton1)
     
     % Newton's method with x0 = 1.5
-    newton2 = zeros(1,10);
+    newton2 = zeros(1,len);
     newton2(1) = 1.5;
     for i=2:length(newton2)
         newton2(i) = step(newton2(i-1));
@@ -18,7 +20,6 @@ function [answer] = hw3_q1()
     
     figure
     plot(1:length(newton2), newton2)
-    
     answer = newton2;
 end
 
