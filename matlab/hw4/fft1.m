@@ -60,11 +60,15 @@ func5fft = fft(func5);
 func6fft = fft(func6);
 func7fft = fft(func7);
 
-error = func1fft;
+% fourier transform of approximation
+% NOT SURE ABOUT THIS PART
+multiplier = 50*1i.*j1;
+dapprox1 = ifft(multiplier.*func1fft);
+error = abs(dapprox1 - dexact1);
 end
 
 
-function [transform] = fft(x)
+function [transform] = myfft(x)
     len = length(x);
     transform = zeros(1,len);
     
@@ -80,9 +84,10 @@ function [transform] = fft(x)
         odd = zeros(1,halfLen);
         
         % split the dfs into even and odd parts
-        for i = 0:halfLen-1
-            even(i+1) = x(2*(i+1));
-            odd (i+1) = x(2*(i+1)-1);
+        for i = 1:halfLen
+            % shift everything up one
+            even(i) = x(2*(i)-1);
+            odd (i) = x(2*(1));
         end
         
         % compute partial solutions
@@ -90,10 +95,10 @@ function [transform] = fft(x)
         odd = fft(odd);
         
         % combine solutions
-        for k = 0:halfLen-1
-            omega = exp(-2*pi*i*(k+1)/len);
-            transform(k+1) = even(k+1) + omega * odd(k+1);
-            transform(k+1+halfLen) = even(k+1)- omega * odd(k+1);
+        for k = 1:halfLen
+            omega = exp(2*pi*i*(k-1)/len);
+            transform(k) = (even(k) + odd(k)*omega)/2;
+            transform(k+halfLen) = (even(k) - odd(k)*omega)/2;
             return;
         end
     end

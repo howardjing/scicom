@@ -39,7 +39,7 @@ function [newton newtonCounter broyden broydenCounter nResults bResults] = hw3_q
     % Compare Newton and Broyden for the last starting point calculated
     [a b c] = Newton(sigma, rho, beta, initialPoints(length(initial),:));
     nResults = analyzeError(a, c);
-    [a b c] = Broyden(sigma, rho, beta, initialPoints(length(initial),:));
+    [a b c] = Broyden(sigma, rho, beta, initialPoints(2,:));
     bResults = analyzeError(a, c);
 end
 

@@ -10,6 +10,9 @@ function [answer] = hw3_q1()
     end
     
     plot(1:length(newton1), newton1)
+    title('Newtons Method Iterations with x0=0.5')
+    xlabel ('Number of Iterations')
+    ylabel ('x_(k+1)')
     
     % Newton's method with x0 = 1.5
     newton2 = zeros(1,len);
@@ -20,6 +23,9 @@ function [answer] = hw3_q1()
     
     figure
     plot(1:length(newton2), newton2)
+    title('Newtons Method Iterations with x0=1.5')
+    xlabel ('Number of Iterations')
+    ylabel ('x_(k+1)')
     answer = newton2;
 end
 
