@@ -1,4 +1,4 @@
-function [max_error] = prob1
+function [max_error] = findError(function1, functionP1)
  
     xj = setUpGrid();
     [rowMax colMax] = size(xj);
@@ -19,7 +19,7 @@ function [max_error] = prob1
         len = 2^(i+3);
         fxj(i,1:len) = sin50(xj(i,1:len));
         derivative_xj(i,1:len) = derivative(xj(i,1:len));
-        appx_deriv_xj(i,1:len) = approx(fxj(i,1:len), period);
+        appx_deriv_xj(i,1:len) = approx(fxj(i,1:len));
     end
     
     % find errors
@@ -31,16 +31,16 @@ function [max_error] = prob1
         max_error(i) = max(error(i,1:len));
     end
     
-    appxderiv = appx_deriv_xj(1,1:16);
-    deriv = derivative_xj(1,1:16);
+    % appxderiv = appx_deriv_xj(1,1:16);
+    % deriv = derivative_xj(1,1:16);
 end
 
 % find an approximation for the derivative of a function using fft
-function [approximation] = approx(fx, period)
-    multiplier = 2*pi*1i/period;
+function [approximation] = approx(fx)
+    n = length(fx);
+    multiplier = 1i.*[0:(n/2-1) -n/2:-1];
     transform = fft(fx);
-    alpha = 0:(length(fx)-1);
-    transformed_deriv = multiplier.*alpha.*transform;
+    transformed_deriv = multiplier.*transform;
     approximation = ifft(transformed_deriv);
 end
 

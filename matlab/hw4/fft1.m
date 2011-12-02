@@ -1,4 +1,4 @@
-function [errorvec] = fft1
+function [dinverse1 dexact1] = fft1
 
 m = 4:1:10;
 N = 2.^m;
