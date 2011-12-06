@@ -1,6 +1,22 @@
-function [ft] = lorenzTester
+function [] = lorenzTester
+
     h = 0.01;
-    initialPoints = [0.1 -0.1 0.0];
+    initialPoints1 = [0.1 -0.1 0.0];
+    initialPoints2 = [0.10001 -0.10002 0.0];
+    
+    lorenz1 = lorenzSolver(initialPoints1, h);
+    lorenz2 = lorenzSolver(initialPoints2, h);
+    
+    %plotAll(lorenz1);
+    plot(lorenz1(:,1), lorenz1(:,2), 'r');
+    hold on
+    plot(lorenz2(:,1), lorenz2(:,2));
+    %plotAll(lorenz2);
+    
+end
+
+% solves the lorenz equations based on initial points, and timestep
+function [ft] = lorenzSolver(initialPoints, h)
     t = 0:h:100;
     
     ft = zeros(length(t),3);
@@ -10,8 +26,12 @@ function [ft] = lorenzTester
     for i = 2:length(t)
         ft(i,:) = rk4Step(ft(i-1,:),h);
     end
-    
-    % plot stuff
+end
+
+% plots the lorenz points
+function [] = plotAll(ft)
+
+    % plot lorenz1
     %X Y plot
     subplot(2,2,1)
     plot(ft(:,1), ft(:,2), 'r') 
@@ -27,8 +47,10 @@ function [ft] = lorenzTester
     % X Y Z plot.
     subplot(2,2,4)
     plot3(ft(:,1), ft(:,2), ft(:,3),'r') 
+    
 end
 
+% one step of runge-kutta 4
 function [answer] = rk4Step(x,h)
     % y_n+1 = y_n + 1/6 (e_1 + 2e_2 + 2e_3 + e_4);
     
