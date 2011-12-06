@@ -10,6 +10,23 @@ function [ft] = lorenzTester
     for i = 2:length(t)
         ft(i,:) = rk4Step(ft(i-1,:),h);
     end
+    
+    % plot stuff
+    %X Y plot
+    subplot(2,2,1)
+    plot(ft(:,1), ft(:,2), 'r') 
+
+    %X Z plot
+    subplot(2,2,2)
+    plot(ft(:,1), ft(:,3), 'r') 
+
+    %Z Y plot
+    subplot(2,2,3)
+    plot(ft(:,3), ft(:,2), 'r') 
+
+    % X Y Z plot.
+    subplot(2,2,4)
+    plot3(ft(:,1), ft(:,2), ft(:,3),'r') 
 end
 
 function [answer] = rk4Step(x,h)
