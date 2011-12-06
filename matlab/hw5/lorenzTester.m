@@ -8,11 +8,23 @@ function [] = lorenzTester
     lorenz2 = lorenzSolver(initialPoints2, h);
     
     %plotAll(lorenz1);
+    %hold on
+    %plotAll(lorenz2);
+    
     plot(lorenz1(:,1), lorenz1(:,2), 'r');
     hold on
     plot(lorenz2(:,1), lorenz2(:,2));
-    %plotAll(lorenz2);
+    hold off
     
+    % plot the difference
+    figure
+    plot(0:h:100, findDifference(lorenz1, lorenz2))
+    
+end
+
+% finds the difference between the two slightly perturbed initial values
+function [difference] = findDifference(lorenz1, lorenz2)
+    difference = (lorenz1 - lorenz2);
 end
 
 % solves the lorenz equations based on initial points, and timestep
